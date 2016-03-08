@@ -2,8 +2,8 @@
 
 BeginPackage["SchriefferWolff`"]
 
-computePerturbativeTranformation::usage = 
-	"MainFunction[ x] computes a simple function."
+computePerturbativeTranformation::usage =
+	"computePerturbativeTranformation[ inputH0, inputV, inputOrder] takes in a base Hamiltonian inputH0, a perturbation inputV, and calculates the SW Transformation to the inputOrder-th order."
 
 Begin["Private`"]
 computePerturbativeTranformation[inputH0_,inputV_,inputOrder_]:=Module[{H0=inputH0,V=inputV,order=inputOrder,HTot,dim,Hextra,Comm,Sadd,Hextra2,n,m,i,S2,H1,H2,Heff,Stot,A},(
@@ -21,6 +21,3 @@ Normal[Series[MatrixExp[-I*Stot],{A,0,order}]]/.{A->1}
 )]
 End[]
 EndPackage[]
-
-
-
