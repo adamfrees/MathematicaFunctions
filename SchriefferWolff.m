@@ -11,9 +11,21 @@ HTot = H0+V;
 dim=Dimensions[H0][[1]];
 Comm[A_,B_]:=A.B-B.A;
 
+Stot = 0;
+For[i = 1, i <= order, i++, Stot = Stot + S[[i]] \[Lambda]^i;];
+Heff = H0 + \[Lambda] V;
+
+Adjoint[x_] := Comm[I*Stot, x]
+
+For[i = 1, i <= order, i++, Heff = Heff + Nest[Adjoint, H0 + \[Lambda] V, i]/i!];
+
+Hx[i_] := Simplify[SeriesCoefficient[TensorExpand[Heff, Assumptions -> \[Lambda] \[Element] Reals], {\[Lambda], 0, i}] + I*Comm[H0, S[[i]]]];
+
+Hextras = Array[Hx, order];
+
 Stot = Table [0,{n,1,dim},{m,1,dim}];
 For[i=1,i<=order,i++,
-Hextra = If[i==1,V,If[i==2,\[Minus]Comm[Stot,Comm[Stot,H0]]/2+I Comm[Stot,V],Throw[i]]];
+Hextra = Hextras[[i]];
 Sadd=Simplify[Table [If[ n==m,0,-((I Hextra[[n,m]])/(H0[[n]][[n]]\[Minus]H0[[m]][[m]]))],{n,1,dim},{m,1,dim}]];
 Stot = Stot + (A^i)*Sadd;
 ];
