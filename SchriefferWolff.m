@@ -67,7 +67,7 @@ Hx[i_] := Simplify[SeriesCoefficient[TensorExpand[Heff, Assumptions -> \[Lambda]
 HextrasSYM = Array[Hx, order];
 (***************************************)
 Stot = Table [0,{n,1,dim},{m,1,dim}];
-SMats = Table[Table [0,{n,1,dim},{m,1,dim}],order];
+SMats = Table[Table [0,{n,1,dim},{m,1,dim}],{i,1,order}];
 For[i=1,i<=order,i++,
 Rules = {H0->H0Mat,V->VMat};
 rule[i_] := S[[i]]->SMats[[i]];
