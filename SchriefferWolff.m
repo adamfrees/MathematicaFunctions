@@ -1,12 +1,13 @@
 (* ::Package:: *)
 
 BeginPackage["SchriefferWolff`"]
-
+Off[Part::partd]
 computePerturbativeTranformation::usage =
 	"computePerturbativeTranformation[ inputH0, inputV, inputOrder] takes in a base Hamiltonian inputH0, a perturbation inputV, and calculates the SW Transformation to the inputOrder-th order."
 
 Begin["Private`"]
 computePerturbativeTranformation[inputH0_,inputV_,inputOrder_]:=Module[{H0Mat=inputH0,VMat=inputV,order=inputOrder,HTot,dim,Hextra,Comm,Sadd,Hextra2,n,m,i,S2,H1,H2,Heff,Stot,A,toReturn,H0,V},(
+
 HTotMat = H0Mat+VMat;
 dim=Dimensions[H0Mat][[1]];
 Comm[A_,B_]:=A.B-B.A;
@@ -26,10 +27,10 @@ HextrasSYM = Array[Hx, order];
 (***************************************)
 Stot = Table [0,{n,1,dim},{m,1,dim}];
 SMats = Table[Table [0,{n,1,dim},{m,1,dim}],order];
+For[i=1,i<=order,i++,
 Rules = {H0->H0Mat,V->VMat};
 rule[i_] := S[[i]]->SMats[[i]];
 Rules = Join[Rules,Array[rule,order]];
-For[i=1,i<=order,i++,
 Hextra = HextrasSYM[[i]]/.Rules;
 SMats[[i]]=Simplify[Table [If[ n==m,0,-((I Hextra[[n,m]])/(H0Mat[[n]][[n]]\[Minus]H0Mat[[m]][[m]]))],{n,1,dim},{m,1,dim}]];
 Stot = Stot + (A^i)*SMats[[i]];
@@ -45,6 +46,7 @@ computeSubspaceTranformation::usage =
 
 Begin["Private`"]
 computeSubspaceTranformation[inputHam_,inputOrder_,lastLowEnergyIndex_]:=Module[{HTotMat=inputHam,order=inputOrder,cutoff=lastLowEnergyIndex,VMat,H0Mat,dim,Hextra,Comm,Sadd,Hextra2,n,m,i,S2,H1,H2,Heff,Stot,A,toReturn,H0,V},(
+
 dim=Dimensions[HTotMat][[1]];
 VMat = Table[If[((m <= cutoff && n <= cutoff) || (m > cutoff && n > cutoff)),0, HTotMat[[n, m]]], {n, 1, dim}, {m, 1, dim}];
 H0Mat = Table[If[(!(m <= cutoff && n <= cutoff) && !(m > cutoff && n > cutoff)),0, HTotMat[[n, m]]], {n, 1, dim}, {m, 1, dim}];
@@ -66,13 +68,12 @@ HextrasSYM = Array[Hx, order];
 (***************************************)
 Stot = Table [0,{n,1,dim},{m,1,dim}];
 SMats = Table[Table [0,{n,1,dim},{m,1,dim}],order];
+For[i=1,i<=order,i++,
 Rules = {H0->H0Mat,V->VMat};
 rule[i_] := S[[i]]->SMats[[i]];
 Rules = Join[Rules,Array[rule,order]];
-For[i=1,i<=order,i++,
 Hextra = HextrasSYM[[i]]/.Rules;
 SMats[[i]]=Simplify[Table [If[ ((m <= cutoff && n <= cutoff) || (m > cutoff && n > cutoff)),0,-((I Hextra[[n,m]])/(H0Mat[[n]][[n]]\[Minus]H0Mat[[m]][[m]]))],{n,1,dim},{m,1,dim}]];
-Print[SMats];
 Stot = Stot + (A^i)*SMats[[i]];
 ];
 toReturn = IdentityMatrix[dim];
